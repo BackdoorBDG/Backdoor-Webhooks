@@ -47,6 +47,15 @@ app.post('/webhook/:id', (req, res) => {
     }
 });
 
+// Get all webhooks
+app.get('/api/webhooks', (req, res) => {
+    res.json(Object.keys(webhooks).map(id => ({
+        id,
+        url: webhooks[id].url,
+        lastUpdated: webhooks[id].data.length ? webhooks[id].data[webhooks[id].data.length - 1].timestamp : null
+    })));
+});
+
 // Get webhook data
 app.get('/api/webhooks/:id', (req, res) => {
     const { id } = req.params;
