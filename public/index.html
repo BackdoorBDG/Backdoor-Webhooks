@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Matrix - Create</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="particles" class="particles"></div>
+    <div class="container">
+        <h1>Webhook Matrix</h1>
+        <div class="card">
+            <h2>Create Webhook</h2>
+            <button onclick="generateWebhook()">Generate New Webhook</button>
+            <div class="webhook-info" id="webhookInfo"></div>
+        </div>
+    </div>
+    <script src="particles.js"></script>
+    <script>
+        async function generateWebhook() {
+            const response = await fetch('/api/webhooks', { method: 'POST' });
+            const data = await response.json();
+            const infoDiv = document.getElementById('webhookInfo');
+            infoDiv.innerHTML = `Webhook Created!<br>ID: ${data.id}<br>URL: <a href="${data.url}" target="_blank">${data.url}</a>`;
+        }
+    </script>
+</body>
+</html>
