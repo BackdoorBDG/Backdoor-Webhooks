@@ -11,17 +11,24 @@
     <div id="particles" class="particles"></div>
     <div class="container">
         <h1>Webhook Matrix</h1>
-        <div class="card">
+        <div class="data-card">
             <h2>View Webhook Data</h2>
-            <input type="text" id="webhookId" placeholder="Enter Webhook ID">
-            <button onclick="fetchData()">Fetch Data</button>
-            <div class="data-list" id="dataList"></div>
+            <div class="input-group">
+                <input type="text" id="webhookId" placeholder="Enter Webhook ID or use URL parameter">
+                <button onclick="fetchData()">Fetch Data</button>
+            </div>
+            <div class="data-display" id="dataList"></div>
         </div>
     </div>
     <script src="particles.js"></script>
     <script>
         async function fetchData() {
-            const webhookId = document.getElementById('webhookId').value;
+            let webhookId = document.getElementById('webhookId').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id') && !webhookId) {
+                webhookId = urlParams.get('id');
+                document.getElementById('webhookId').value = webhookId;
+            }
             if (!webhookId) {
                 alert('Please enter a webhook ID');
                 return;
@@ -30,16 +37,26 @@
             const data = await response.json();
             const dataList = document.getElementById('dataList');
             if (data.error) {
-                dataList.innerHTML = `<div class="data-item">${data.error}</div>`;
+                dataList.innerHTML = `<div class="data-item error">${data.error}</div>`;
             } else {
                 dataList.innerHTML = data.data.map(item => `
                     <div class="data-item">
-                        <strong>${item.timestamp}</strong><br>
-                        ${JSON.stringify(item.payload, null, 2)}
+                        <div class="timestamp">${new Date(item.timestamp).toLocaleString()}</div>
+                        <div class="payload">
+                            <strong>Payload:</strong><br>
+                            <pre>${JSON.stringify(item.payload, null, 2)}</pre>
+                        </div>
                     </div>
                 `).join('');
             }
         }
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id')) {
+                fetchData();
+            }
+        });
     </script>
 </body>
 </html>
