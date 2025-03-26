@@ -3,28 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook Matrix - Create</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>Webhook Manager - Create</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="particles" class="particles"></div>
     <div class="container">
-        <h1>Webhook Matrix</h1>
+        <h1>Webhook Manager</h1>
         <div class="card">
             <h2>Create Webhook</h2>
             <button onclick="generateWebhook()">Generate New Webhook</button>
             <div class="webhook-info" id="webhookInfo"></div>
         </div>
+        <div class="card">
+            <h2>Your Webhooks</h2>
+            <div class="webhook-list" id="webhookList"></div>
+        </div>
     </div>
-    <script src="particles.js"></script>
     <script>
         async function generateWebhook() {
             const response = await fetch('/api/webhooks', { method: 'POST' });
             const data = await response.json();
             const infoDiv = document.getElementById('webhookInfo');
             infoDiv.innerHTML = `Webhook Created!<br>ID: ${data.id}<br>URL: <a href="${data.url}" target="_blank">${data.url}</a>`;
+            loadWebhooks();
         }
+
+        async function loadWebhooks() {
+            const response = await fetch('/api/webhooks');
+            const webhooks = await response.json();
+            const listDiv = document.getElementById('webhookList');
+            listDiv.innerHTML = webhooks.length > 0 ? webhooks.map(w => `
+                <div class="webhook-item">
+                    <strong>ID:</strong> ${w.id}<br>
+                    <strong>URL:</strong> <a href="${w.url}" target="_blank">${w.url}</a><br>
+                    <strong>Last Updated:</strong> ${w.lastUpdated || 'Never'}<br>
+                    <a href="/view.html?id=${w.id}" target="_blank">View Data</a>
+                </div>
+            `).join('') : '<p>No webhooks created yet.</p>';
+        }
+
+        // Load webhooks on page load
+        window.addEventListener('load', loadWebhooks);
     </script>
 </body>
 </html>
