@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Matrix - View Data</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="particles" class="particles"></div>
+    <div class="container">
+        <h1>Webhook Matrix</h1>
+        <div class="card">
+            <h2>View Webhook Data</h2>
+            <input type="text" id="webhookId" placeholder="Enter Webhook ID">
+            <button onclick="fetchData()">Fetch Data</button>
+            <div class="data-list" id="dataList"></div>
+        </div>
+    </div>
+    <script src="particles.js"></script>
+    <script>
+        async function fetchData() {
+            const webhookId = document.getElementById('webhookId').value;
+            if (!webhookId) {
+                alert('Please enter a webhook ID');
+                return;
+            }
+            const response = await fetch(`/api/webhooks/${webhookId}`);
+            const data = await response.json();
+            const dataList = document.getElementById('dataList');
+            if (data.error) {
+                dataList.innerHTML = `<div class="data-item">${data.error}</div>`;
+            } else {
+                dataList.innerHTML = data.data.map(item => `
+                    <div class="data-item">
+                        <strong>${item.timestamp}</strong><br>
+                        ${JSON.stringify(item.payload, null, 2)}
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
